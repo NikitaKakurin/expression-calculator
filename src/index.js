@@ -4,9 +4,6 @@ function eval() {
 }
 
 function expressionCalculator(expr) {
-  breckets={};
-  let countOpenBrackets =0;
-  let countCloseBrackets = 0;
   let expresion = expr;
   expresion = expresion.replace(/\s/g,'');
   console.log(expresion);
@@ -36,34 +33,67 @@ function expressionCalculator(expr) {
   
   function calculate (exprSlice){
     let multipIndex;
+    //        /
     while(exprSlice.indexOf("/")!=-1){
       multipIndex = exprSlice.indexOf("/");
-      if(exprSlice[multipIndex+1]=="-"){
+
+      if([multipIndex]==3 && exprSlice[0]=="-"){
+        if(exprSlice[multipIndex+1]=="-"){
+          if(exprSlice[multipIndex+2]==0) throw("TypeError: Division by zero.");
+          exprSlice.splice(0,5,(+exprSlice[multipIndex-1])/(+exprSlice[multipIndex+2]));
+        }else{
+          if(exprSlice[multipIndex+1]==0) throw("TypeError: Division by zero.");
+        exprSlice.splice(0,4,-(+exprSlice[multipIndex-1])/(+exprSlice[multipIndex+1]));
+        }
+      }else if(exprSlice[multipIndex+1]=="-"){
+        if(exprSlice[multipIndex+2]==0) throw("TypeError: Division by zero.");
         exprSlice.splice(multipIndex-1,4,-(+exprSlice[multipIndex-1])/(+exprSlice[multipIndex+2]));
       }else{
+        if(exprSlice[multipIndex+1]==0) throw("TypeError: Division by zero.");
       exprSlice.splice(multipIndex-1,3,(+exprSlice[multipIndex-1])/(+exprSlice[multipIndex+1]));
       }
     }
+    //          *
     while(exprSlice.indexOf("*")!=-1){
       multipIndex = exprSlice.indexOf("*");
-      if(exprSlice[multipIndex+1]=="-"){
+      if([multipIndex]==3 && exprSlice[0]=="-"){
+        if(exprSlice[multipIndex+1]=="-"){
+          exprSlice.splice(0,5,(+exprSlice[multipIndex-1])*(+exprSlice[multipIndex+2]));
+        }else{
+        exprSlice.splice(0,4,-(+exprSlice[multipIndex-1])*(+exprSlice[multipIndex+1]));
+        }
+      }else if(exprSlice[multipIndex+1]=="-"){
         exprSlice.splice(multipIndex-1,4,-(+exprSlice[multipIndex-1])*(+exprSlice[multipIndex+2]));
       }else{
       exprSlice.splice(multipIndex-1,3,(+exprSlice[multipIndex-1])*(+exprSlice[multipIndex+1]));
       }
     }
+    //    -
     while(exprSlice.indexOf("-")!=-1){
       multipIndex = exprSlice.indexOf("-");
-      if(exprSlice[multipIndex+1]=="-"){
-        exprSlice.splice(multipIndex-1,3,(+exprSlice[multipIndex-1])+(+exprSlice[multipIndex+2]));
+      if([multipIndex]==3 && exprSlice[0]=="-"){
+        if(exprSlice[multipIndex+1]=="-"){
+          exprSlice.splice(0,5,-(+exprSlice[multipIndex-1])+(+exprSlice[multipIndex+2]));
+        }else{
+        exprSlice.splice(0,4,-(+exprSlice[multipIndex-1])-(+exprSlice[multipIndex+1]));
+        }
+      }else if(exprSlice[multipIndex+1]=="-"){
+        exprSlice.splice(multipIndex-1,4,(+exprSlice[multipIndex-1])+(+exprSlice[multipIndex+2]));
       }else{
       exprSlice.splice(multipIndex-1,3,(+exprSlice[multipIndex-1])-(+exprSlice[multipIndex+1]));
       }
     }
+    //       +
     while(exprSlice.indexOf("+")!=-1){
       multipIndex = exprSlice.indexOf("+");
-      if(exprSlice[multipIndex+1]=="-"){
-        exprSlice.splice(multipIndex-1,3,(+exprSlice[multipIndex-1])-(+exprSlice[multipIndex+2]));
+      if([multipIndex]==3 && exprSlice[0]=="-"){
+        if(exprSlice[multipIndex+1]=="-"){
+          exprSlice.splice(0,5,-(+exprSlice[multipIndex-1])-(+exprSlice[multipIndex+2]));
+        }else{
+        exprSlice.splice(0,4,-(+exprSlice[multipIndex-1])+(+exprSlice[multipIndex+1]));
+        }
+      }else if(exprSlice[multipIndex+1]=="-"){
+        exprSlice.splice(multipIndex-1,4,(+exprSlice[multipIndex-1])-(+exprSlice[multipIndex+2]));
       }else{
       exprSlice.splice(multipIndex-1,3,(+exprSlice[multipIndex-1])+(+exprSlice[multipIndex+1]));
       }
@@ -73,7 +103,7 @@ function expressionCalculator(expr) {
 
   function expressionBrackets(exprInBrackets){
     let str = exprInBrackets.match(/\([^\(\)]*\)/)[0];
-    if (str==null){return "Error Wrong Brackets"}
+    if (str==null){ throw 'ExpressionError: Brackets must be paired'}
     let calc = calculate(strToArray(str.slice(1,-1)));
     expresion=exprInBrackets.replace(/\([^\(\)]*\)/,calc);
     return expresion;
@@ -82,13 +112,12 @@ function expressionCalculator(expr) {
   while (expresion.indexOf("(")!=-1){
     if (expresion.indexOf("(")!=-1){
       expresion=expressionBrackets(expresion);
-      if (expresion==="Error Wrong Brackets") return expresion
     }else if(expresion.indexOf(")")!=-1){
-      return "Error Wrong Brackets";
+      throw 'ExpressionError: Brackets must be paired';
     }
   }
-  if(expresion.indexOf(")")!=-1) return "Error Wrong Brackets";
-  return expresion;
+  if(expresion.indexOf(")")!=-1) throw 'ExpressionError: Brackets must be paired';
+  return Number.parseFloat(expresion);
   // write your solution here
 }
 
