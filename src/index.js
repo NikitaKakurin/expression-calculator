@@ -38,7 +38,7 @@ function expressionCalculator(expr) {
       multipIndex = exprSlice.indexOf("/");
 
       if([multipIndex]==3 && exprSlice[0]=="-"){
-        if(exprSlice[multipIndex+1]=="-"){
+        if(exprSlice[multipIndex+1]=="-"){//if after /-
           if(exprSlice[multipIndex+2]==0) throw("TypeError: Division by zero.");
           exprSlice.splice(0,5,(+exprSlice[multipIndex-1])/(+exprSlice[multipIndex+2]));
         }else{
@@ -46,6 +46,7 @@ function expressionCalculator(expr) {
         exprSlice.splice(0,4,-(+exprSlice[multipIndex-1])/(+exprSlice[multipIndex+1]));
         }
       }else if(exprSlice[multipIndex+1]=="-"){
+        //if after /-
         if(exprSlice[multipIndex+2]==0) throw("TypeError: Division by zero.");
         exprSlice.splice(multipIndex-1,4,-(+exprSlice[multipIndex-1])/(+exprSlice[multipIndex+2]));
       }else{
@@ -58,6 +59,7 @@ function expressionCalculator(expr) {
       multipIndex = exprSlice.indexOf("*");
       if([multipIndex]==3 && exprSlice[0]=="-"){
         if(exprSlice[multipIndex+1]=="-"){
+          //if after *-
           exprSlice.splice(0,5,(+exprSlice[multipIndex-1])*(+exprSlice[multipIndex+2]));
         }else{
         exprSlice.splice(0,4,-(+exprSlice[multipIndex-1])*(+exprSlice[multipIndex+1]));
@@ -72,6 +74,7 @@ function expressionCalculator(expr) {
     while(exprSlice.indexOf("-")!=-1){
       multipIndex = exprSlice.indexOf("-");
       if([multipIndex]==3 && exprSlice[0]=="-"){
+        //after --
         if(exprSlice[multipIndex+1]=="-"){
           exprSlice.splice(0,5,-(+exprSlice[multipIndex-1])+(+exprSlice[multipIndex+2]));
         }else{
@@ -79,6 +82,9 @@ function expressionCalculator(expr) {
         }
       }else if(exprSlice[multipIndex+1]=="-"){
         exprSlice.splice(multipIndex-1,4,(+exprSlice[multipIndex-1])+(+exprSlice[multipIndex+2]));
+      }else if(exprSlice[multipIndex-1]=="+"){
+        //before +-
+        exprSlice.splice(multipIndex-2,4,(+exprSlice[multipIndex-2])-(+exprSlice[multipIndex+1]));
       }else{
       exprSlice.splice(multipIndex-1,3,(+exprSlice[multipIndex-1])-(+exprSlice[multipIndex+1]));
       }
@@ -87,6 +93,7 @@ function expressionCalculator(expr) {
     while(exprSlice.indexOf("+")!=-1){
       multipIndex = exprSlice.indexOf("+");
       if([multipIndex]==3 && exprSlice[0]=="-"){
+        //if after +-
         if(exprSlice[multipIndex+1]=="-"){
           exprSlice.splice(0,5,-(+exprSlice[multipIndex-1])-(+exprSlice[multipIndex+2]));
         }else{
@@ -102,15 +109,18 @@ function expressionCalculator(expr) {
   }
 
   function expressionBrackets(exprInBrackets){
-    let str = exprInBrackets.match(/\([^\(\)]*\)/)[0];
+    let str = exprInBrackets.match(/\([^\(\)]*\)/);
+    if (str.length===0) { throw 'ExpressionError: Brackets must be paired'}
+    str=str[0];
     if (str==null){ throw 'ExpressionError: Brackets must be paired'}
     let calc = calculate(strToArray(str.slice(1,-1)));
     expresion=exprInBrackets.replace(/\([^\(\)]*\)/,calc);
     return expresion;
   }
-  
+  //loop for expression
   while (expresion.indexOf("(")!=-1){
     if (expresion.indexOf("(")!=-1){
+      if (expresion.indexOf(")")===-1){throw 'ExpressionError: Brackets must be paired'};
       expresion=expressionBrackets(expresion);
     }else if(expresion.indexOf(")")!=-1){
       throw 'ExpressionError: Brackets must be paired';
